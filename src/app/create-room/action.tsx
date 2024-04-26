@@ -2,6 +2,7 @@
 import { db } from "@/db";
 import { Room, room } from "@/db/schema"; // Assuming Room type definition
 import { getSession } from "@/lib/auth";
+import { revalidatePath } from "next/cache";
 const CreateRoomAction = async (roomData: Omit<Room, "id" |"userId">) => {
   // Assuming roomData only contains properties from the Room type
   const session = await getSession()
@@ -11,6 +12,8 @@ const CreateRoomAction = async (roomData: Omit<Room, "id" |"userId">) => {
   }
   
   await db.insert(room).values({ ...roomData, userId: session.user.id });
+
+  revalidatePath("/")
 };
 
 export default CreateRoomAction;
