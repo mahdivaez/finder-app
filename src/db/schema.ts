@@ -81,7 +81,7 @@ import { sql } from "drizzle-orm"
       name: text("name").notNull(),
       description: text("description").notNull(),
       githubRepo: text("githubRepo"),
-      language: text("language")
+      tags: text("tags")
    })
     
 

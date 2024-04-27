@@ -60,6 +60,7 @@ const Header = () => {
           className="flex gap-2 items-center text-xl hover:underline"
         >
           <Image
+          className="rounded"
             src="/icon.png"
             width="60"
             height="60"
