@@ -1,5 +1,5 @@
+"use server"
 import { StreamChat } from "stream-chat";
-("use server");
 import { getSession } from "@/lib/auth";
 
 export async function generateTokenAction() {

@@ -5,7 +5,6 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { db } from "@/db";
 
-
 declare module "next-auth" {
     interface Session extends DefaultSession {
       user: {

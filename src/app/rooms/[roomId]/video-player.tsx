@@ -1,64 +1,75 @@
-"use client"
+"use client";
+
+import "@stream-io/video-react-sdk/dist/css/styles.css";
 import { Room } from "@/db/schema";
-import { stepButtonClasses } from "@mui/material";
 import {
-    Call,
+  Call,
+  CallControls,
+  CallParticipantsList,
+  SpeakerLayout,
   StreamCall,
+  StreamTheme,
   StreamVideo,
   StreamVideoClient,
-  User,
 } from "@stream-io/video-react-sdk";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
-import {
-    CallControls,
-    SpeakerLayout,
-    StreamTheme,
-  } from '@stream-io/video-react-sdk';
-  
-  import '@stream-io/video-react-sdk/dist/css/styles.css';
-  import { generateTokenAction } from "@/lib/action";
+import { useCallback, useEffect, useState } from "react";
+
+import { useRouter } from "next/navigation";
+import { generateTokenAction } from "@/lib/action";
 
 const apiKey = process.env.NEXT_PUBLIC_GET_STREAM_API_KEY!;
-const userId = "user-id";
-const token = "";
 
-
-export function DevFinderVideo({room}:{room:Room}) {
-
-    const session = useSession();
+export function DevFinderVideo({ room }: { room: Room }) {
+  const session = useSession();
   const [client, setClient] = useState<StreamVideoClient | null>(null);
   const [call, setCall] = useState<Call | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    if (!room || !session.data || !apiKey || !token) return;
-
+    if (!room) return;
+    if (!session.data) {
+      return;
+    }
     const userId = session.data.user.id;
-    const client = new StreamVideoClient({ apiKey, user: { id: userId },tokenProvider:() => generateTokenAction() });
-
+    const client = new StreamVideoClient({
+      apiKey,
+      user: {
+        id: userId,
+        name: session.data.user.name ?? undefined,
+        image: session.data.user.image ?? undefined,
+      },
+      tokenProvider: () => generateTokenAction(),
+    });
     const call = client.call("default", room.id);
     call.join({ create: true });
-
     setClient(client);
     setCall(call);
 
     return () => {
-      call.leave();
-      client.disconnectUser();
+      call
+        .leave()
+        .then(() => client.disconnectUser())
+        .catch(console.error);
     };
-  }, [session, room, apiKey, token]);
+  }, [session, room]);
 
   return (
-    client && call && (
+    client &&
+    call && (
       <StreamVideo client={client}>
-        <StreamCall call={call}>
-          <StreamTheme>
+        <StreamTheme>
+          <StreamCall call={call}>
             <SpeakerLayout />
-            <CallControls />
-          </StreamTheme>
-        </StreamCall>
+            <CallControls
+              onLeave={() => {
+                router.push("/");
+              }}
+            />
+            <CallParticipantsList onClose={() => undefined} />
+          </StreamCall>
+        </StreamTheme>
       </StreamVideo>
     )
   );
 }
-
