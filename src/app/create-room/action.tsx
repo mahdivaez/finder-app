@@ -1,19 +1,20 @@
 "use server";
-import { db } from "@/db";
-import { Room, room } from "@/db/schema"; // Assuming Room type definition
+
+import { createRoom } from "@/data-access/rooms";
+import { Room } from "@/db/schema";
 import { getSession } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
-const CreateRoomAction = async (roomData: Omit<Room, "id" |"userId">) => {
-  // Assuming roomData only contains properties from the Room type
-  const session = await getSession()
-  console.log(session);
-  if(!session) {
-    throw new Error("You must logged in before creating a room");
+
+export async function createRoomAction(roomData: Omit<Room, "id" | "userId">) {
+  const session = await getSession();
+
+  if (!session) {
+    throw new Error("you must be logged in to create this room");
   }
-  
-  await db.insert(room).values({ ...roomData, userId: session.user.id });
 
-  revalidatePath("/")
-};
+  const room = await createRoom(roomData, session.user.id);
 
-export default CreateRoomAction;
+  revalidatePath("/browse");
+
+  return room;
+}

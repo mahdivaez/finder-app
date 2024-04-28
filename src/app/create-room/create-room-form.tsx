@@ -1,4 +1,5 @@
-"use client"
+"use client";
+
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -13,49 +14,42 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import CreateRoomAction from "./action";
-import { useEffect } from "react";
-import { useNavigation } from "react-router-dom";
-import { useRouter } from 'next/navigation';
-
-// Use next/navigation instead of next/router
+// import { createRoomAction } from "./actions";
+import { useRouter } from "next/navigation";
+import { createRoomAction } from "./action";
+// import { useToast } from "@/components/ui/use-toast";
 
 const formSchema = z.object({
-  name : z.string().min(1).max(50),
-  description : z.string().min(1).max(250),
-  tags : z.string().min(1).max(50),
-  githubRepo : z.string().min(1).max(50),
-
+  name: z.string().min(1).max(50),
+  description: z.string().min(1).max(250),
+  githubRepo: z.string().min(1).max(50),
+  tags: z.string().min(1).max(50),
 });
 
-export default function CreateRoomForm() {
-    const router = useRouter(); // Use useRouter for navigation
+export function CreateRoomForm() {
+  // const { toast } = useToast();
 
-  const form = useForm({
+  const router = useRouter();
+
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       description: "",
-      tags : "",
-      githubRepo : "",
+      githubRepo: "",
+      tags: "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // Assuming you have the userId available from some context or session
-    const userId = "someUserId";
-  
-    // Ensure that the object passed to CreateRoomAction includes all expected properties
-    const roomData = {
-      userId: userId,
-      githubRrpo: values.githubRepo, // Correct the property name here
-      ...values, // Spread the form values
-    };
-  
-    await CreateRoomAction(roomData);
-    router.push("/"); // Use router.push for navigation
-
+    const room = await createRoomAction(values);
+    // toast({
+    //   title: "Room Created",
+    //   description: "Your room was successfully created",
+    // });
+    // router.push(`/rooms/${room.id}`);
   }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -66,74 +60,74 @@ export default function CreateRoomForm() {
             <FormItem>
               <FormLabel>Name</FormLabel>
               <FormControl>
-                <Input  {...field} placeholder="Side-Project" />
+                <Input {...field} placeholder="Dev Finder Is Awesome" />
               </FormControl>
-              <FormDescription>
-                This is your public display name.
-              </FormDescription>
+              <FormDescription>This is your public room name.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
-
-<FormField
+        <FormField
           control={form.control}
           name="description"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Input  {...field}   placeholder="Im working on a side project , come join me "/>
+                <Input
+                  {...field}
+                  placeholder="Im working on a side project, come join me"
+                />
               </FormControl>
               <FormDescription>
-                Please describe what you will be coding on .
+                Please describe what you are be coding on
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
-<FormField
-          control={form.control}
-          name="tags"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tags</FormLabel>
-              <FormControl>
-                <Input  {...field} placeholder="typescript , nextjs , tailwind" />
-              </FormControl>
-              <FormDescription> 
-                 
-                    List your programming languages , framework , libraries so people can find you content
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-<FormField
+        <FormField
           control={form.control}
           name="githubRepo"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Github Repo</FormLabel>
               <FormControl>
-                <Input  {...field} placeholder="https://github.com/your-repo"/>
+                <Input
+                  {...field}
+                  placeholder="https://github.com/webdevcody/dev-finder"
+                />
               </FormControl>
               <FormDescription>
-                Please put a link to the project you are working on 
+                Please put a link to the project you are working on
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
+        <FormField
+          control={form.control}
+          name="tags"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Tags</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="typescript, nextjs, tailwind" />
+              </FormControl>
+              <FormDescription>
+                List your programming languages, frameworks, libraries so people
+                can find you content
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <Button type="submit">Submit</Button>
       </form>
     </Form>
- 
-     
   );
 }
