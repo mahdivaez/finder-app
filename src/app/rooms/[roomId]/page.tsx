@@ -4,8 +4,8 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge"
 import { Langar } from "next/font/google";
 import { TagsList } from "@/components/tags-list";
-import { splitTags } from "@/components/tags-list";
 import { DevFinderVideo } from "./video-player";
+import { splitTags } from "@/lib/utils";
 export default async function RoomPage(props: { params: { roomId: string } }) {
   const roomId = props.params.roomId;
   const room = await getRoom(roomId);

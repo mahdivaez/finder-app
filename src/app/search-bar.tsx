@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { SearchIcon } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+import { log } from "console";
 
 const formSchema = z.object({
   search: z.string().min(0).max(50),
@@ -16,6 +17,7 @@ const formSchema = z.object({
 export function SearchBar() {
   const router = useRouter();
   const query = useSearchParams();
+  
 
   const form = useForm({
     resolver: zodResolver(formSchema),
